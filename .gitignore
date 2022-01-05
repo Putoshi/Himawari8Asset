@@ -1,0 +1,17 @@
+.DS_Store
+node_modules/
+.tmp/
+.idea/
+.cache/
+.awspublish-*
+.cache-loader/
+build/
+public/
+deploy/
+credentials/
+npm-debug.log
+
+.vscode
+.envrc
+
+tmp/

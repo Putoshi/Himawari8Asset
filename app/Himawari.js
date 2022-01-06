@@ -1,5 +1,7 @@
 const axios = require('axios');
 const himawari = require('himawari');
+const exec = require('child_process').exec;
+const path = require('path');
 const moment = require('moment');
 const momentTimezone = require('moment-timezone');
 
@@ -7,13 +9,14 @@ const Queue = require('./Queue');
 
 const TENMIN = 10 * 60 * 1000;
 const JST2GMT = 9 * 6 * TENMIN;
+const ASSET_PATH = './tmp/';
 
 module.exports = class Himawari {
 
   constructor() {
 
     this.latest = null;
-    this.zoom = 5;
+    this.zoom = 2;
   }
 
   init() {
@@ -40,6 +43,17 @@ module.exports = class Himawari {
     }
   }
 
+  createVideo(){
+    const video = path.join(ASSET_PATH, 'earth.mp4');
+    exec('cat ' + path.join(`${ASSET_PATH}`, '*.jpg') + ' | ffmpeg -f image2pipe -framerate 12 -vcodec mjpeg -analyzeduration 100M -probesize 100M -i - -vcodec libx264 ' + video, function (err, res) {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('File saved to', video);
+      }
+    });
+  }
+
   getImage (_date){
     const fd = Himawari.formatDate(_date, 'yyyyMMddHHmm');
     let zoom = this.zoom;
@@ -48,7 +62,7 @@ module.exports = class Himawari {
         himawari({
           zoom: zoom,
           date: new Date(_date.getTime() - JST2GMT), //Thu Jan 06 2022 22:20:00 GMT+0900 (Japan Standard Time)
-          outfile: `./tmp/${fd}.jpg`,
+          outfile: `${ASSET_PATH}${fd}.jpg`,
           debug: false,
           infrared: false,
           skipEmpty: true,

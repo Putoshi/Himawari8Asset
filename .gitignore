@@ -13,5 +13,7 @@ npm-debug.log
 
 .vscode
 .envrc
+*.mp4
 
 tmp/
+dist/

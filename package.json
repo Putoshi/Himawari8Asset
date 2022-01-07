@@ -18,8 +18,11 @@
   "homepage": "https://github.com/Putoshi/Himawari8Asset#readme",
   "devDependencies": {
     "axios": "^0.24.0",
+    "compress-images": "^2.0.4",
+    "gifsicle": "^5.2.1",
     "himawari": "git@github.com:ChrisG661/himawari.js.git",
     "moment": "^2.29.1",
-    "moment-timezone": "^0.5.34"
+    "moment-timezone": "^0.5.34",
+    "pngquant-bin": "^6.0.1"
   }
 }

@@ -12,6 +12,7 @@ const Config = require('../config/Config');
 
 const TENMIN = 10 * 60 * 1000;
 const JST2GMT = 9 * 6 * TENMIN;
+const ONEDAY = 24 * 6 * TENMIN;
 
 module.exports = class Himawari {
 
@@ -33,6 +34,12 @@ module.exports = class Himawari {
       this.latest = t;
       const fd = Himawari.formatDate(this.latest, 'yyyyMMddHHmm');
       console.log(`LATEST : ${fd}`);
+    }).catch(error => {
+      const {
+        status,
+        statusText
+      } = error.response;
+      console.log(`Error! HTTP Status: ${status} ${statusText}`);
     });
   }
 
@@ -43,6 +50,10 @@ module.exports = class Himawari {
       let target = this.latest.getTime() - TENMIN * i;
       await this.getImage(new Date(target));
     }
+  }
+
+  async getNew() {
+    await this.getImage(new Date(this.latest.getTime()));
   }
 
   async createVideo() {
@@ -63,6 +74,29 @@ module.exports = class Himawari {
     files.forEach(async function (file) {
       const deletefiles = await fs.unlink(`${_path}/${file}`);
     });
+  }
+
+  async deleteOld(_path) {
+    const files = await fs.readdir(_path);
+    files.forEach(async (file)=>{
+      const dateStr = file.split('.')[0];
+      const m = moment({
+        year       : parseInt(dateStr.slice(0,4)),
+        month      : parseInt(dateStr.slice(4,6)) - 1,
+        day        : parseInt(dateStr.slice(6,8)),
+        hour       : parseInt(dateStr.slice(8,10)),
+        minute     : parseInt(dateStr.slice(10,12)),
+      });
+
+      const beforeOneDay = moment(this.latest.getTime() + JST2GMT - ONEDAY).toDate();
+      const fileTimestamp = moment(m.toDate().getTime() + JST2GMT).toDate();
+
+      if(fileTimestamp.getTime() <= beforeOneDay.getTime()) {
+        console.log(`1日以上経った古いファイル削除 : ${_path}/${files[0]}`);
+        const deletefiles = await fs.unlink(`${_path}/${files[0]}`);
+      }
+    });
+
   }
 
   getImage(_date) {
@@ -98,8 +132,12 @@ module.exports = class Himawari {
   }
 
   async getLatestData() {
-    const url = 'https://himawari8.nict.go.jp/img/FULL_24h/latest.json';
-    return await axios.get(url);
+    try {
+      const url = 'https://himawari8.nict.go.jp/img/FULL_24h/latest.json';
+      return await axios.get(url);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   static formatDate(date, format) {

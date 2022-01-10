@@ -6,8 +6,6 @@ const path = require('path');
 const moment = require('moment');
 const momentTimezone = require('moment-timezone');
 
-
-const Queue = require('./Queue');
 const Config = require('../config/Config');
 
 const TENMIN = 10 * 60 * 1000;
@@ -44,16 +42,18 @@ module.exports = class Himawari {
   }
 
   async getOneDay() {
-    console.log('getOneDay');
     const loopCnt = 6 * 24;
     for (let i = 0; i < loopCnt; i++) {
       let target = this.latest.getTime() - TENMIN * i;
-      await this.getImage(new Date(target));
+      // let target = 1641778800000 - TENMIN * i;
+      await this.getImage(new Date(target)).catch(()=>{
+        console.log(`${target} Through`);
+      });
     }
   }
 
   async getNew() {
-    await this.getImage(new Date(this.latest.getTime()));
+    await this.getImage(new Date(this.latest.getTime())).catch(() => console.log('getNew Error!'));
   }
 
   async createVideo() {
@@ -102,33 +102,32 @@ module.exports = class Himawari {
   getImage(_date) {
     const fd = Himawari.formatDate(_date, 'yyyyMMddHHmm');
     let zoom = this.zoom;
-    Queue.add(function () {
-      const promise = new Promise(function (resolve, reject) {
-        himawari({
-          zoom: zoom,
-          date: new Date(_date.getTime() - JST2GMT), //Thu Jan 06 2022 22:20:00 GMT+0900 (Japan Standard Time)
-          outfile: `${Config.TMP_PATH}${fd}.jpg`,
-          debug: false,
-          infrared: false,
-          skipEmpty: true,
-          parallel: false,
-          timeout: 30000,
-          success: function (info) {
-            console.log(info);
-            resolve();
-          },
-          error: function (err) {
-            console.log(err);
-            reject();
-          },
-          chunk: function (info) {
-            console.log(fd + ': ' + info.part + '/' + info.total);
-          }
-        });
+    const promise = new Promise(function (resolve, reject) {
+      himawari({
+        zoom: zoom,
+        date: new Date(_date.getTime() - JST2GMT), //Thu Jan 06 2022 22:20:00 GMT+0900 (Japan Standard Time)
+        outfile: `${Config.TMP_PATH}${fd}.jpg`,
+        debug: false,
+        infrared: false,
+        skipEmpty: true,
+        parallel: false,
+        timeout: 30000,
+        success: function (info) {
+          console.log(info);
+          resolve();
+        },
+        error: function (err) {
+          console.log('himawari.js ERROR');
+          console.log(err);
+          reject();
+        },
+        chunk: function (info) {
+          console.log(fd + ': ' + info.part + '/' + info.total);
+        }
       });
-      return promise;
+
     });
-    return Queue.queue;
+    return promise;
   }
 
   async getLatestData() {

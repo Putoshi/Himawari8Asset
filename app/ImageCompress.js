@@ -27,7 +27,6 @@ module.exports = class ImageCompress {
     });
     promise.catch(() => {
       console.log('compress ERROR');
-      return Promise.reject('compress ERROR');
     });
     return promise;
   }

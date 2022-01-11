@@ -33,11 +33,12 @@ module.exports = class Himawari {
       const fd = Himawari.formatDate(this.latest, 'yyyyMMddHHmm');
       console.log(`LATEST : ${fd}`);
     }).catch(error => {
-      const {
-        status,
-        statusText
-      } = error.response;
-      console.log(`Error! HTTP Status: ${status} ${statusText}`);
+      console.log(`Error! HTTP Status: ${error}`);
+      // const {
+      //   status,
+      //   statusText
+      // } = error.response;
+      // console.log(`Error! HTTP Status: ${status} ${statusText}`);
     });
   }
 
@@ -54,17 +55,6 @@ module.exports = class Himawari {
 
   async getNew() {
     await this.getImage(new Date(this.latest.getTime())).catch(() => console.log('getNew Error!'));
-  }
-
-  async createVideo() {
-    const video = path.join(Config.DIST_PATH, 'earth.mp4');
-    await exec('cat ' + path.join(`${Config.DIST_PATH}`, '*.jpg') + ' | ffmpeg -f image2pipe -framerate 12 -vcodec mjpeg -analyzeduration 100M -probesize 100M -i - -vcodec libx264 ' + video, function (err, res) {
-      if (err) {
-        console.error(err);
-      } else {
-        console.log('File saved to', video);
-      }
-    });
   }
 
   async refresh(_path) {

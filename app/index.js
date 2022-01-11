@@ -7,6 +7,9 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const ImageCompress = require('./ImageCompress');
+const VideoMaker = require('./VideoMaker');
+
+const S3Uploader = require('./S3Uploader');
 const Config = require('../config/Config');
 const Himawari = require('./Himawari');
 const himawari = new Himawari();
@@ -20,7 +23,10 @@ const getOneDay = async() =>{
   await himawari.refresh(Config.DIST_PATH);
   await himawari.getOneDay();
   await ImageCompress.compress();
-  await himawari.createVideo();
+  await VideoMaker.createVideo();
+  await VideoMaker.resizeVideo();
+
+  await S3Uploader.upload();
 };
 
 
@@ -30,7 +36,10 @@ const getNew = async() =>{
   await himawari.getNew();
   await himawari.deleteOld(Config.TMP_PATH);
   await ImageCompress.compress();
-  await himawari.createVideo();
+  await VideoMaker.createVideo();
+  await VideoMaker.resizeVideo();
+
+  await S3Uploader.upload();
 };
 
 // 元データは1日ごとにアーカイブしてく

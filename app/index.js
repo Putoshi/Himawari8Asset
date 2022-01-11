@@ -14,8 +14,6 @@ const himawari = new Himawari();
 
 let currentDate = null;
 let latest = null;
-const TENMIN = 10 * 60 * 1000;
-const JST2GMT = 9 * 6 * TENMIN;
 
 const getOneDay = async() =>{
   await himawari.refresh(Config.TMP_PATH);
@@ -25,9 +23,6 @@ const getOneDay = async() =>{
   await himawari.createVideo();
 };
 
-const test = async() =>{
-  await himawari.deleteOld(Config.TMP_PATH);
-};
 
 // クーロンでファイル更新があった場合に実行
 const getNew = async() =>{
@@ -53,12 +48,11 @@ const archive = async(currentDate) =>{
 
 const startCron = async function(){
   console.log('CRON START');
+
   cron.schedule('0 */3 * * * *', (d) => {
 
     himawari.init().then((result)=>{
-      // let t = moment(new Date(`${himawari.latest}`).getTime() + JST2GMT).toDate();
-
-      let t = moment(new Date(`${himawari.latest}`).getTime() + JST2GMT);
+      let t = moment(new Date(`${himawari.latest}`).getTime());
       if(currentDate == null) currentDate = t.format('YYYYMMDD');
 
       // 更新があった場合の処理
@@ -89,7 +83,6 @@ himawari.init().then((result)=>{
   (async () => {
     await getOneDay();
     await startCron();
-    // await test();
   })();
 });
 

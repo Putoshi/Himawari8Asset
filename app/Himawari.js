@@ -62,7 +62,7 @@ module.exports = class Himawari {
     console.log(files);
 
     files.forEach(async function (file) {
-      const deletefiles = await fs.unlink(`${_path}/${file}`);
+      const deletefiles = await fs.unlink(`${_path}${file}`);
     });
   }
 
@@ -82,8 +82,8 @@ module.exports = class Himawari {
       const fileTimestamp = moment(m.toDate().getTime() + JST2GMT).toDate();
 
       if(fileTimestamp.getTime() <= beforeOneDay.getTime()) {
-        console.log(`1日以上経った古いファイル削除 : ${_path}/${files[0]}`);
-        const deletefiles = await fs.unlink(`${_path}/${files[0]}`);
+        console.log(`1日以上経った古いファイル削除 : ${_path}${files[0]}`);
+        const deletefiles = await fs.unlink(`${_path}${files[0]}`);
       }
     });
 

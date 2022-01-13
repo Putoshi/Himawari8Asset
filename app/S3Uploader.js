@@ -85,7 +85,11 @@ module.exports = class S3Uploader {
         //   `!${Config.UPLOAD_PATH}/**`,
         // ]
       }
-    )
+    ).then(()=>{
+      console.log('////// S3Upload COMPLETE!! //////');
+    }).catch(()=>{
+      console.log('////// S3Upload ERROR!!!! //////');
+    });
 
     await fsExtra.remove(Config.TMP_UPLOAD_PATH);
     await fsExtra.remove(Config.UPLOAD_PATH);

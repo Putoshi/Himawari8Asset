@@ -58,7 +58,7 @@ const archive = async(currentDate) =>{
 const startCron = async function(){
   console.log('CRON START');
 
-  cron.schedule('0 */3 * * * *', (d) => {
+  cron.schedule('0 */2 * * * *', (d) => {
 
     himawari.init().then((result)=>{
       let t = moment(new Date(`${himawari.latest}`).getTime());

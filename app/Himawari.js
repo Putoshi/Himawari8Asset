@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const axios = require('axios');
+const axiosRetry = require('axios-retry');
 const himawari = require('himawari');
 const exec = require('child_process').exec;
 const path = require('path');
@@ -11,6 +12,17 @@ const Config = require('../config/Config');
 const TENMIN = 10 * 60 * 1000;
 const JST2GMT = 9 * 6 * TENMIN;
 const ONEDAY = 24 * 6 * TENMIN;
+
+axiosRetry(axios, {
+  retries: 5,
+  retryDelay: (retryCount) => {
+    console.log(`retry attempt: ${retryCount}`);
+    return retryCount * 2000; // time interval between retries
+  },
+  retryCondition: (error) => {
+    return error.response.status === 503;
+  },
+});
 
 module.exports = class Himawari {
 

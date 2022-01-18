@@ -59,7 +59,7 @@ module.exports = class Himawari {
     for (let i = 0; i < loopCnt; i++) {
       let target = this.latest.getTime() - TENMIN * i;
       // let target = 1641778800000 - TENMIN * i;
-      await this.getImage(new Date(target)).catch(()=>{
+      await this.getImage(new Date(target)).catch(() => {
         console.log(`${target} Through`);
       });
     }
@@ -73,32 +73,32 @@ module.exports = class Himawari {
     const files = await fs.readdir(_path);
     console.log(files);
 
-    files.forEach(async function (file) {
+    for (const file of files) {
       const deletefiles = await fs.unlink(`${_path}${file}`);
-    });
+    }
   }
 
   async deleteOld(_path) {
     const files = await fs.readdir(_path);
-    files.forEach(async (file)=>{
+
+    for (const file of files) {
       const dateStr = file.split('.')[0];
       const m = moment({
-        year       : parseInt(dateStr.slice(0,4)),
-        month      : parseInt(dateStr.slice(4,6)) - 1,
-        day        : parseInt(dateStr.slice(6,8)),
-        hour       : parseInt(dateStr.slice(8,10)),
-        minute     : parseInt(dateStr.slice(10,12)),
+        year: parseInt(dateStr.slice(0, 4)),
+        month: parseInt(dateStr.slice(4, 6)) - 1,
+        day: parseInt(dateStr.slice(6, 8)),
+        hour: parseInt(dateStr.slice(8, 10)),
+        minute: parseInt(dateStr.slice(10, 12)),
       });
 
       const beforeOneDay = moment(this.latest.getTime() + JST2GMT - ONEDAY).toDate();
       const fileTimestamp = moment(m.toDate().getTime() + JST2GMT).toDate();
 
-      if(fileTimestamp.getTime() <= beforeOneDay.getTime()) {
-        console.log(`1日以上経った古いファイル削除 : ${_path}${files[0]}`);
-        const deletefiles = await fs.unlink(`${_path}${files[0]}`);
+      if (fileTimestamp.getTime() <= beforeOneDay.getTime()) {
+        console.log(`1日以上経った古いファイル削除 : ${_path}${file}`);
+        await fs.unlink(`${_path}${file}`);
       }
-    });
-
+    }
   }
 
   getImage(_date) {

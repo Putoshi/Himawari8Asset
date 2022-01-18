@@ -47,9 +47,9 @@ const archive = async(currentDate) =>{
   console.log(`Data Archive : ${Config.ARCHIVE_PATH}${currentDate}`);
   const archiveDir = await makeDir(`${Config.ARCHIVE_PATH}${currentDate}`);
   const files = await fs.readdir(Config.TMP_PATH);
-  files.forEach(async function (file) {
+  for (const file of files) {
     const copyArchives = await fsExtra.copy(`${Config.TMP_PATH}${file}`, `${Config.ARCHIVE_PATH}${currentDate}/${file}`);
-  });
+  }
 };
 
 

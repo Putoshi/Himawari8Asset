@@ -5,7 +5,7 @@
   "main": "app/index.js",
   "scripts": {
     "setup": "sh setup.sh",
-    "dev": "node app/index.js",
+    "dev": "nodemon app/index.js",
     "upload": "node app/S3Uploader.js"
   },
   "repository": {
@@ -30,6 +30,7 @@
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.34",
     "node-cron": "^3.0.0",
+    "nodemon": "^2.0.15",
     "pngquant-bin": "^6.0.1",
     "zlib": "^1.0.5"
   }
